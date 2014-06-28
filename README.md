@@ -1,6 +1,8 @@
 **Perf**
 =========
-#### Performance Log Aggregator and Reporting Dashboard for performance logs. **A Flask/Python app**
+#### Performance Log Aggregator and Reporting Dashboard for performance logs. 
+
+A Flask/Python app
 
 
 ----------
@@ -17,7 +19,7 @@
 		```<working dir>$ . env/bin/activate```
 		
 - install required python packages  
-		```<working dir>$ pip install -r requirements.txt
+		```<working dir>$ pip install -r requirements.txt```
 
 ----------
 
