@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Default Title!</title>  
+        <!-- Bootstrap css -->
+        <link href="{{url_for('static', filename='css/bootstrap.css')}}" rel="stylesheet" media="screen">
+    </head>
+
+    <body>
+        <!-- Main content -->
+        {% block content %}
+        {% endblock %}
+    </body>
+</html>
