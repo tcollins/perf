@@ -9,7 +9,7 @@ A Flask/Python app
 
 #### Install
 
-- prerequisites packages
+- prerequisites packages  
 		```git python2.7 mysql-server mysql-client libmysqlclient-dev python-mysqldb python-dev```
         
 - create a virutalenv in the project dir  
