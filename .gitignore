@@ -1,2 +1,4 @@
 env
 *.pyc
+application.log
+.data-uploads
