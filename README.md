@@ -33,4 +33,11 @@ curl -F "appname=AppNameGoesHere" -F "file=@performance.log" http://localhost:50
 
 ----------
 
-...
+
+```
+SELECT DATE_FORMAT(created, '%Y-%m-%d 00:00:00') formattedcreated, app, method,
+count(duration) callcount,  sum(duration) totalduration,
+round(avg(duration)) avgduration, min(duration) minduration, max(duration) maxduration, std(duration) stdev
+FROM rawlog
+group by app, method, formattedcreated
+```

@@ -1,7 +1,10 @@
-body            {padding-top: 20px; padding-bottom: 20px;}
+body            {padding-top: 20px; padding-bottom: 20px; background: url("../img/cream_dust.png");}
 .navbar         {margin-bottom: 20px;}
 
-.navbar-inverse .navbar-brand               {color: #58eac9; font-size: 32px; font-weight:bold;}
-.navbar-inverse .navbar-brand:hover         {color: #2be4ba;}
-.navbar-inverse .navbar-nav > li > a        {color: #58eac9;}
-.navbar-inverse .navbar-nav > li > a:hover  {color: #2be4ba;}
+.navbar-inverse                             {background-color: #fff; border-color: #1ce2b5;}
+.navbar-inverse .navbar-brand               {color: #1ce2b5; font-size: 32px; font-weight:bold;}
+.navbar-inverse .navbar-brand:hover         {color: #1ad3a9;}
+.navbar-inverse .navbar-nav > li > a        {color: #1ce2b5;}
+.navbar-inverse .navbar-nav > li > a:hover  {color: #1ad3a9; text-decoration: underline;}
+
+.form-control::-moz-placeholder             {color: #ccc;}
