@@ -2,16 +2,15 @@
 import os
 from flask import request, render_template, url_for, redirect
 from werkzeug import secure_filename
+from pprint import pprint
 
 from app import app, models
-
-dataLoader = models.DataLoader("blah");
 
 # Front page
 @app.route('/index')
 @app.route('/')
 def index():
-    return render_template("hello.html")
+    return render_template("index.html")
 
 @app.route('/tim')
 def tim():
@@ -26,19 +25,18 @@ def allowed_file(file):
 @app.route('/upload-data', methods=['GET', 'POST'])
 def uploaddata():
     if request.method == 'POST':
-        file = request.files['file']
+        file = request.files['file']        
+        ##pprint(vars(request))        
+        appname = request.form['appname']        
         if file and allowed_file(file):
             filename = secure_filename(file.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)                            
-            dataLoader.loadFromFilePath(filepath);            
-            return redirect(url_for('uploaddata', filename=filename))   
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form action="" method=post enctype=multipart/form-data>
-      <p><input type=file name=file>
-         <input type=submit value=Upload>
-    </form>
-    '''
+            file.save(filepath)
+            
+            dataLoader = models.DataLoader(appname);
+            dataLoader.loadFromFilePath(filepath);
+            
+            return redirect(url_for('uploaddata'))  
+        
+    return render_template("upload-data.html")    
+       

@@ -22,13 +22,13 @@ A Flask/Python app
 		```<working dir>$ pip install -r requirements.txt```
 
 - create "perf" mysql database and run the create schema script
-		```ALTER TABLE `rawlog` ADD UNIQUE `rawlog_unique_index`(`created`, `duration`, `method`);```
+		```ALTER TABLE `rawlog` ADD UNIQUE `rawlog_unique_index`(`created`, `duration`, `app`, `method`);```
 
 ----------
 
 #### Load performance log data into the app
 ```sh
-curl -F "file=@performance.log" http://localhost:5000/upload-data
+curl -F "appname=AppNameGoesHere" -F "file=@performance.log" http://localhost:5000/upload-data
 ```
 
 ----------
