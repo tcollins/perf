@@ -16,6 +16,8 @@ def index():
 @app.route('/tim')
 def tim():
     app.logger.info('Tim')
+    ##dataLoader.loadFromFilePath('/home/tcollins/dev/temp/test-performance-short.log');
+    ##models.create_initial_db_schema();
     return "TIM"
 
 def allowed_file(file):

@@ -3,5 +3,6 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 UPLOAD_FOLDER = '/home/tcollins/dev/perf/.data-uploads'
 
-#SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
-#SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
+## dialect+driver://username:password@host:port/database
+SQLALCHEMY_DATABASE_URI = 'mysql://root:password@localhost/perf'
+SQLALCHEMY_ECHO = True

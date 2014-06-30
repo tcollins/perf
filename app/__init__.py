@@ -1,11 +1,16 @@
 import logging
 from flask import Flask
-##from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.sqlalchemy import SQLAlchemy
 from logging.handlers import RotatingFileHandler
 
 app = Flask(__name__)
 app.config.from_object('config')
+db = SQLAlchemy(app)
+
+##app = Flask(__name__)
+##app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 ##db = SQLAlchemy(app)
+
 
 ## setup logging
 formatter = logging.Formatter("[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s")

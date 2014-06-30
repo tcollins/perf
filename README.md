@@ -21,6 +21,9 @@ A Flask/Python app
 - install required python packages  
 		```<working dir>$ pip install -r requirements.txt```
 
+- create "perf" mysql database and run the create schema script
+		```ALTER TABLE `rawlog` ADD UNIQUE `rawlog_unique_index`(`created`, `duration`, `method`);```
+
 ----------
 
 #### Load performance log data into the app
@@ -29,3 +32,4 @@ curl -F "file=@performance.log" http://localhost:5000/upload-data
 ```
 
 ----------
+
