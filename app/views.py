@@ -10,7 +10,7 @@ from app import app, models
 @app.route('/index')
 @app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template("index.html", title="PERF")
 
 @app.route('/tim')
 def tim():
@@ -38,5 +38,5 @@ def uploaddata():
             
             return redirect(url_for('uploaddata'))  
         
-    return render_template("upload-data.html")    
+    return render_template("upload-data.html", title="PERF - Upload Data")    
        

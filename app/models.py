@@ -26,6 +26,7 @@ class Rawlog(db.Model):
     def __repr__(self):
         return '<Rawlog {} [{}] {}>'.format(self.created, self.duration, self.method)
     
+    
 ############################################################
 ## DataLoader
 class DataLoader():
