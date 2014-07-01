@@ -10,7 +10,15 @@ from app import app, models
 @app.route('/index')
 @app.route('/')
 def index():
-    return render_template("index.html", title="PERF")
+    
+    #apps = models.DailySummary.query(models.DailySummary.app.distinct()).all();
+    #apps = models.db.session.query(models.DailySummary.app.distinct()).all()
+    apps = models.findAllAppNames()
+    #admin = User.query.filter_by(username='admin').first()
+    
+    app.logger.info(apps)
+    
+    return render_template("index.html", title="PERF", apps=apps)
 
 @app.route('/tim')
 def tim():
@@ -18,14 +26,18 @@ def tim():
     ##dataLoader.loadFromFilePath('/home/tcollins/dev/temp/test-performance-short.log');
     ##models.create_initial_db_schema();
     
-    #aggregator = models.DataAggregator();
+    ##aggregator = models.DataAggregator();
     #aggregator.aggregate();            
     return "TIM"
 
 def allowed_file(file):
     return True
 
-@app.route('/upload-data', methods=['GET', 'POST'])
+@app.route('/api/')
+def api():
+    return render_template("api.html", title="PERF - API Documentation") 
+
+@app.route('/api/upload-data', methods=['POST'])
 def uploaddata():
     if request.method == 'POST':
         file = request.files['file']        
@@ -39,7 +51,11 @@ def uploaddata():
             dataLoader = models.DataLoader(appname);
             dataLoader.loadFromFilePath(filepath);
             
-            return redirect(url_for('uploaddata'))  
-        
-    return render_template("upload-data.html", title="PERF - Upload Data")    
+            return "Data Upload Complete!" 
        
+    
+@app.route('/api/aggregate')
+def apiAggregate():        
+    aggregator = models.DataAggregator();
+    aggregator.aggregate();            
+    return "Aggregation Complete!"

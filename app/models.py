@@ -140,4 +140,19 @@ class DataAggregator():
             except IntegrityError: 
                 db.session.rollback()
             
+            
+            
+############################################################
+## Query methods
+
+def findAllAppNames():    
+    arr = []
+    
+    apps = db.session.query(DailySummary.app.distinct()).order_by(DailySummary.app).all()
+    for appname in apps:       
+        arr.append(appname[0])        
+    
+    return arr;
+        
+        
         

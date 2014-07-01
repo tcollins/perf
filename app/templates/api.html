@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">        
+        <h1>Upload Data <small>/api/upload-data</small></h1>
+        <h4 class="text-muted">Use this to load new performance logs into the system</h4>
+        <blockquote>
+            <p class="text-primary" style="font-family: monospace; font-size: 12px;">
+                curl -F "appname=AppNameGoesHere" -F "file=@performance.log" http://localhost:5000/api/upload-data
+            </p>    
+        </blockquote>
+    </div>  
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="col-md-12">        
+        <h1>Aggregate <small>/api/aggregate</small></h1>
+        <h4 class="text-muted">Use this to trigger the data aggregator to update</h4>
+        <blockquote>
+            <p class="text-primary" style="font-family: monospace; font-size: 12px;">                
+                curl http://localhost:5000/api/aggregate
+            </p>    
+        </blockquote>
+    </div>  
+</div>
+
+
+
+
+{% endblock %}

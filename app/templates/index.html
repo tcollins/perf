@@ -2,6 +2,12 @@
 
 {% block content %}
 <div class="hero-unit">
-    <h1>PERF</h1>    
+          
+    {% for appname in apps %}
+        <h3>{{ appname }}</h3>
+    {% else %}
+        <em>No data has been loaded yet. Check out the <a href="/api/">API page</a> to see how to load data.</em>
+    {% endfor %}
+    
 </div>
 {% endblock %}
