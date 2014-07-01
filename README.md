@@ -49,7 +49,7 @@ SQLALCHEMY_ECHO = True
 
 ----------
 
-## Run ###
+## Run ##
 
 ```sh
 <working dir>$ python run.py
