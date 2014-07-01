@@ -1,8 +1,10 @@
 from app import app, db 
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from pprint import pprint
+
 
 def create_initial_db_schema():
     db.create_all()
@@ -44,6 +46,35 @@ class DailySummary(db.Model):
     
     def __repr__(self):
         return '<DailySummary {} {}.{} - {},{}>'.format(self.formattedcreated, self.app, self.method, self.callcount, self.avgduration)    
+    
+    def formattedMethod(self):
+        arr = self.method.split('.')
+        l = len(arr)        
+        return '{}.{}'.format(arr[l-2],arr[l-1])
+
+    
+############################################################
+## MonthlySummary
+## 
+class MonthlySummary(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    formattedcreated = db.Column(db.DateTime, nullable = False, index=True)    
+    app = db.Column(db.String(40), nullable = False, index=True) ## DocScores
+    method = db.Column(db.String(200), nullable = False, index=True) ## com...AdServerService.findTabletBySlug
+    callcount = db.Column(db.Integer, nullable = False, index=True)    
+    totalduration = db.Column(db.Integer, nullable = False)    
+    avgduration = db.Column(db.Integer, nullable = False, index=True)    
+    minduration = db.Column(db.Integer, nullable = False)    
+    maxduration = db.Column(db.Integer, nullable = False)   
+    stdev = db.Column(db.Float, nullable = False)   
+    
+    def __repr__(self):
+        return '<MonthlySummary {} {}.{} - {},{}>'.format(self.formattedcreated, self.app, self.method, self.callcount, self.avgduration)    
+    
+    def formattedMethod(self):
+        arr = self.method.split('.')
+        l = len(arr)        
+        return '{}.{}'.format(arr[l-2],arr[l-1])
     
 ############################################################
 ## DataLoader
@@ -94,13 +125,21 @@ class DataAggregator():
     def aggregate(self):        
         app.logger.info('aggregate')
         
-        self.findStartDate()
+        self.findMaxCreateDay()
+        self.findMaxCreateMonth()
+        
+        ##app.logger.info(self.maxcreatedday)
+        ##app.logger.info(self.maxcreatedmonth)
+        
         self.deleteDaily()
         self.aggregateDaily()
         
+        self.deleteMonthly()
+        self.aggregateMonthly()
         
-    ## findStartDate ############################################     
-    def findStartDate(self):
+        
+    ## findMaxCreateDay ############################################     
+    def findMaxCreateDay(self):
         startDateSQL = "SELECT max(formattedcreated) maxcreated FROM daily_summary;"
         result = db.session.execute(startDateSQL)
         
@@ -108,13 +147,33 @@ class DataAggregator():
             maxcreated = row['maxcreated']
             if (maxcreated is not None): 
                 self.maxcreatedday = maxcreated + timedelta(days=-5)
-              
+                ##self.maxcreatedmonth = maxcreated + relativedelta( months = -1 )
+                ##self.maxcreatedmonth = self.maxcreatedmonth.replace(day=1)
+    
+    
+    ## findMaxCreateMonth ############################################     
+    def findMaxCreateMonth(self):
+        sql = "SELECT max(formattedcreated) maxcreated FROM monthly_summary;"
+        result = db.session.execute(sql)
+        
+        for row in result:
+            maxcreated = row['maxcreated']
+            if (maxcreated is not None):                 
+                self.maxcreatedmonth = maxcreated + relativedelta( months = -1 )
+                self.maxcreatedmonth = self.maxcreatedmonth.replace(day=1)
+                
             
     ## deleteDaily ############################################         
     def deleteDaily(self):
         deleteDailySQL = "delete FROM daily_summary where formattedcreated > :maxcreated"    
         db.session.execute(deleteDailySQL, {'maxcreated':self.maxcreatedday})
         db.session.commit()
+        
+    ## deleteMonthly ############################################         
+    def deleteMonthly(self):
+        deleteMonthlySQL = "delete FROM monthly_summary where formattedcreated > :maxcreated"    
+        db.session.execute(deleteMonthlySQL, {'maxcreated':self.maxcreatedmonth})
+        db.session.commit()    
         
         
     ## aggregateDaily ############################################             
@@ -140,7 +199,29 @@ class DataAggregator():
             except IntegrityError: 
                 db.session.rollback()
             
-            
+    ## aggregateMonthly ############################################             
+    def aggregateMonthly(self):
+        monthlyAggSQL = "SELECT DATE_FORMAT(created, '%Y-%m-01 00:00:00') formattedcreated, app, method, count(duration) callcount, sum(duration) totalduration, round(avg(duration)) avgduration, min(duration) minduration, max(duration) maxduration, std(duration) stdev FROM rawlog where created > :maxcreated group by app, method, formattedcreated"
+        
+        result = db.session.execute(monthlyAggSQL, {'maxcreated':self.maxcreatedmonth})                
+        
+        for row in result:
+            monthly = MonthlySummary()
+            monthly.formattedcreated = row['formattedcreated']
+            monthly.app = row['app']
+            monthly.method = row['method']
+            monthly.callcount = row['callcount']
+            monthly.totalduration = row['totalduration']
+            monthly.avgduration = row['avgduration']            
+            monthly.minduration = row['minduration']
+            monthly.maxduration = row['maxduration']
+            monthly.stdev = row['stdev']                       
+           
+            try:
+                db.session.add(monthly)
+                db.session.commit()
+            except IntegrityError: 
+                db.session.rollback()            
             
 ############################################################
 ## Query methods
@@ -148,11 +229,28 @@ class DataAggregator():
 def findAllAppNames():    
     arr = []
     
-    apps = db.session.query(DailySummary.app.distinct()).order_by(DailySummary.app).all()
+    apps = db.session.query(MonthlySummary.app.distinct()).order_by(MonthlySummary.app).all()
     for appname in apps:       
         arr.append(appname[0])        
     
     return arr;
-        
-        
-        
+
+def findMonthlySummaryByAppAndMonth(appname, date, orderStr):     
+    
+    date = date.replace(day=1)
+    date = date.replace(hour=0,minute=0,second=0,microsecond=0)
+    
+    allowedOrderBy = ['callcount', 'totalduration', 'avgduration', 'minduration', 'maxduration', 'stdev']
+    order = 'callcount'
+    if any(orderStr in s for s in allowedOrderBy):
+        order = orderStr
+    
+    records = MonthlySummary.query.filter_by(app=appname,formattedcreated=date).order_by(order + ' desc').all()
+    return records
+
+def findDailySummaryByAppAndDay(appname, day):        
+    records = DailySummary.query.filter_by(app=appname).all()
+    return records
+    
+## SELECT * FROM daily_summary where app = 'PatientPad' and formattedcreated = '2014-06-30 00:00:00'
+##order by callcount desc        

@@ -2,23 +2,53 @@
 import os
 from flask import request, render_template, url_for, redirect
 from werkzeug import secure_filename
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from pprint import pprint
 
 from app import app, models
 
 # Front page
-@app.route('/index')
 @app.route('/')
-def index():
-    
-    #apps = models.DailySummary.query(models.DailySummary.app.distinct()).all();
-    #apps = models.db.session.query(models.DailySummary.app.distinct()).all()
-    apps = models.findAllAppNames()
-    #admin = User.query.filter_by(username='admin').first()
-    
-    app.logger.info(apps)
-    
+def index():  
+    apps = models.findAllAppNames()    
     return render_template("index.html", title="PERF", apps=apps)
+
+
+@app.route('/dashboard/<appname>')
+def dashboard(appname):    
+    
+    title="PERF - " + appname + " Dashboard"
+    now = datetime.now()    
+    
+    dateParam = request.args.get('d')
+    try:
+        date = datetime.strptime(dateParam, '%m-%Y')
+    except:
+        date = now
+   
+    orderParam = request.args.get('o', 'callcount')    
+    summaryData = models.findMonthlySummaryByAppAndMonth(appname, date, orderParam)
+        
+    dateInfo = {
+        "friendly": date.strftime('%B %Y'),
+        "curParam": date.strftime('%m-%Y'),
+        "prevParam": (date + relativedelta( months = -1 )).strftime('%m-%Y'),
+        "nextParam": (date + relativedelta( months = +1 )).strftime('%m-%Y')
+    }
+    
+    xx = (date + relativedelta( months = -1 )).strftime('%m-%Y')
+    app.logger.info(xx)
+    
+    urlPrefix = "/dashboard/"+appname+"?d=" + dateInfo["curParam"]
+    
+    return render_template("dashboard.html", title=title, appname=appname, summaryData=summaryData, dateInfo=dateInfo, urlPrefix=urlPrefix)
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('page_not_found.html'), 404
+
 
 @app.route('/tim')
 def tim():
