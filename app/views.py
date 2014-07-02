@@ -49,7 +49,7 @@ def method(appname, methodname):
     
     timeBucketData = models.findTimeBucketDateForMethod(appname, methodname)
     
-    return render_template("method.html", title=title, appname=appname, methodname=methodname, formattedMethod=formattedMethod)
+    return render_template("method.html", title=title, appname=appname, methodname=methodname, formattedMethod=formattedMethod, timeBucketData=timeBucketData)
 
 @app.errorhandler(404)
 def page_not_found(error):

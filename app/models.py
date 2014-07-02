@@ -274,7 +274,13 @@ def findTimeBucketDateForMethod(appname, methodname):
         {"min":10,"max":29},
         {"min":30,"max":49},
         {"min":50,"max":99},
-        {"min":100,"max":199}
+        {"min":100,"max":199},
+        {"min":200,"max":299},
+        {"min":300,"max":499},
+        {"min":500,"max":699},
+        {"min":700,"max":999},
+        {"min":1000,"max":1999},
+        {"min":2000,"max":1000000}
     ]
     
     for bucket in buckets:        

@@ -12,7 +12,7 @@
 
 ### prerequisites packages ###
 ```sh
-git python2.7 mysql-server mysql-client libmysqlclient-dev python-mysqldb python-dev
+git python2.7 mysql-server mysql-client libmysqlclient-dev python-mysqldb python-dev python-pip
 ```
 
 
@@ -22,13 +22,13 @@ git python2.7 mysql-server mysql-client libmysqlclient-dev python-mysqldb python
 ```
 
 
-### activate virtualenv   ###
+### activate virtualenv ###
 ```sh
 <working dir>$ . env/bin/activate
 ```
 
 		
-### install required python packages  ###
+### install required python packages ###
 ```sh
 <working dir>$ pip install -r requirements.txt
 ```

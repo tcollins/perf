@@ -1,9 +1,37 @@
 {% extends "base.html" %}
 
+
+{% block head %}
+    <link href="{{url_for('static', filename='morris/morris.css')}}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
             
     <h4 style="text-align:center;">{{ appname }}</h4>
     <h3 style="text-align:center;" title="{{ methodname }}">{{ formattedMethod }}</h3>
-   
- 
+    
+    <br>
+    <div id="time-bucket-chart"></div>
+
 {% endblock %}  
+
+
+{% block script %}
+    <script src="{{url_for('static', filename='morris/raphael-min.js')}}"></script>
+    <script src="{{url_for('static', filename='morris/morris.min.js')}}"></script>
+
+    <script>       
+        var tbData = [];    
+        {% for t in timeBucketData %}tbData.push({l: '{{ t.min }} - {{ t.max }}', v:{{ t.cnt }}});
+        {% endfor %}        
+        
+        Morris.Bar({
+          element: 'time-bucket-chart',
+          data: tbData,              
+          xkey: 'l',
+          ykeys: ['v'],
+          labels: ['Calls']
+        });   
+    </script>
+
+{% endblock %} 
