@@ -1,13 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="hero-unit">
-          
+
+<div class="row">    
+    
     {% for appname in apps %}
-        <h3><a href="/dashboard/{{ appname }}">{{ appname }}</a></h3>    
+    <div class="col-md-6">        
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 style="color:#139678; font-weight:bold;" class="panel-title">
+                    <a href="/dashboard/{{ appname }}">{{ appname }}</a>
+                </h3>
+            </div>
+            <div class="panel-body">
+                TODO.. add some stats here
+            </div>
+        </div>
+    </div> 
+    
+        
     {% else %}
         <em>No data has been loaded yet. Check out the <a href="/api/">API page</a> to see how to load data.</em>
     {% endfor %}
     
 </div>
+
 {% endblock %}

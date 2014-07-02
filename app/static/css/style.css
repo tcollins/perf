@@ -1,10 +1,12 @@
 body            {padding-top: 20px; padding-bottom: 20px; background: url("../img/cream_dust.png");}
+a               {color:#139678;}
+a:hover         {color:#11876c;}
 .navbar         {margin-bottom: 20px;}
 
 .navbar-inverse                             {background-color: #fff; border-color: #1ce2b5;}
-.navbar-inverse .navbar-brand               {color: #1ce2b5; font-size: 32px; font-weight:bold;}
-.navbar-inverse .navbar-brand:hover         {color: #1ad3a9;}
-.navbar-inverse .navbar-nav > li > a        {color: #1ce2b5;}
-.navbar-inverse .navbar-nav > li > a:hover  {color: #1ad3a9; text-decoration: underline;}
+.navbar-inverse .navbar-brand               {color: #15a685; font-size: 32px; font-weight:bold;}
+.navbar-inverse .navbar-brand:hover         {color: #139678;}
+.navbar-inverse .navbar-nav > li > a        {color: #139678;}
+.navbar-inverse .navbar-nav > li > a:hover  {color: #11876c; text-decoration: underline;}
 
 .form-control::-moz-placeholder             {color: #ccc;}

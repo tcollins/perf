@@ -11,7 +11,8 @@ from app import app, models
 # Front page
 @app.route('/')
 def index():  
-    apps = models.findAllAppNames()    
+    apps = models.findAllAppNames()        
+    app.logger.info('t i m')    
     return render_template("index.html", title="PERF", apps=apps)
 
 
@@ -37,13 +38,18 @@ def dashboard(appname):
         "nextParam": (date + relativedelta( months = +1 )).strftime('%m-%Y')
     }
     
-    xx = (date + relativedelta( months = -1 )).strftime('%m-%Y')
-    app.logger.info(xx)
-    
     urlPrefix = "/dashboard/"+appname+"?d=" + dateInfo["curParam"]
     
     return render_template("dashboard.html", title=title, appname=appname, summaryData=summaryData, dateInfo=dateInfo, urlPrefix=urlPrefix)
 
+@app.route('/method/<appname>/<methodname>')
+def method(appname, methodname): 
+    formattedMethod = models.formatMethodName(methodname)
+    title="PERF - " + appname + " - " + formattedMethod        
+    
+    timeBucketData = models.findTimeBucketDateForMethod(appname, methodname)
+    
+    return render_template("method.html", title=title, appname=appname, methodname=methodname, formattedMethod=formattedMethod)
 
 @app.errorhandler(404)
 def page_not_found(error):

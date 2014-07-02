@@ -7,9 +7,10 @@ app = Flask(__name__)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 
-##app = Flask(__name__)
-##app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
-##db = SQLAlchemy(app)
+if app.debug:
+    print 'running in debug mode'
+else:
+    print 'NOT running in debug mode'
 
 
 ## setup logging

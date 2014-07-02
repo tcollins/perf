@@ -1,6 +1,8 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+DEBUG = True
+
 UPLOAD_FOLDER = '/home/tcollins/dev/perf/.data-uploads'
 
 ## dialect+driver://username:password@host:port/database

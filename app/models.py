@@ -48,9 +48,7 @@ class DailySummary(db.Model):
         return '<DailySummary {} {}.{} - {},{}>'.format(self.formattedcreated, self.app, self.method, self.callcount, self.avgduration)    
     
     def formattedMethod(self):
-        arr = self.method.split('.')
-        l = len(arr)        
-        return '{}.{}'.format(arr[l-2],arr[l-1])
+        return formatMethodName(self.method)
 
     
 ############################################################
@@ -72,9 +70,8 @@ class MonthlySummary(db.Model):
         return '<MonthlySummary {} {}.{} - {},{}>'.format(self.formattedcreated, self.app, self.method, self.callcount, self.avgduration)    
     
     def formattedMethod(self):
-        arr = self.method.split('.')
-        l = len(arr)        
-        return '{}.{}'.format(arr[l-2],arr[l-1])
+        return formatMethodName(self.method)
+        
     
 ############################################################
 ## DataLoader
@@ -222,7 +219,14 @@ class DataAggregator():
                 db.session.commit()
             except IntegrityError: 
                 db.session.rollback()            
-            
+
+############################################################
+## Helper methods                
+def formatMethodName(methodname):
+        arr = methodname.split('.')
+        l = len(arr)        
+        return '{}.{}'.format(arr[l-2],arr[l-1])                
+                
 ############################################################
 ## Query methods
 
@@ -248,9 +252,42 @@ def findMonthlySummaryByAppAndMonth(appname, date, orderStr):
     records = MonthlySummary.query.filter_by(app=appname,formattedcreated=date).order_by(order + ' desc').all()
     return records
 
-def findDailySummaryByAppAndDay(appname, day):        
-    records = DailySummary.query.filter_by(app=appname).all()
-    return records
+def findTimeBucketDateForMethod(appname, methodname):
+    ## TODO add date range to method args and query
+
+    sql = "select count(*) from rawlog where app = :appname and method = :methodname and duration >= :durmin and duration <=:durmax"
+  
+    #0-9
+    #10-29
+    #30-49
+    #50-99
+    #100-199
+    #200-299
+    #300-499
+    #500-699
+    #700-999
+    #1000-1999
+    #2000+
     
-## SELECT * FROM daily_summary where app = 'PatientPad' and formattedcreated = '2014-06-30 00:00:00'
-##order by callcount desc        
+    buckets = [
+        {"min":0,"max":9},
+        {"min":10,"max":29},
+        {"min":30,"max":49},
+        {"min":50,"max":99},
+        {"min":100,"max":199}
+    ]
+    
+    for bucket in buckets:        
+        result = db.session.execute(sql, {'appname':appname, 'methodname':methodname, 'durmin':bucket["min"], 'durmax':bucket["max"]})         
+        bucket["cnt"] = int(result.fetchone()[0])
+        
+    
+    app.logger.info(buckets)
+    
+    return buckets
+    
+    
+#def findDailySummaryByAppAndDay(appname, day):        
+#    records = DailySummary.query.filter_by(app=appname).all()
+#    return records
+
