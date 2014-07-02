@@ -49,6 +49,9 @@ class DailySummary(db.Model):
     
     def formattedMethod(self):
         return formatMethodName(self.method)
+    
+    def formattedDay(self):
+        return self.formattedcreated.strftime('%Y-%m-%d')
 
     
 ############################################################
@@ -162,13 +165,13 @@ class DataAggregator():
             
     ## deleteDaily ############################################         
     def deleteDaily(self):
-        deleteDailySQL = "delete FROM daily_summary where formattedcreated > :maxcreated"    
+        deleteDailySQL = "delete FROM daily_summary where formattedcreated >= :maxcreated"    
         db.session.execute(deleteDailySQL, {'maxcreated':self.maxcreatedday})
         db.session.commit()
         
     ## deleteMonthly ############################################         
     def deleteMonthly(self):
-        deleteMonthlySQL = "delete FROM monthly_summary where formattedcreated > :maxcreated"    
+        deleteMonthlySQL = "delete FROM monthly_summary where formattedcreated >= :maxcreated"    
         db.session.execute(deleteMonthlySQL, {'maxcreated':self.maxcreatedmonth})
         db.session.commit()    
         
@@ -253,22 +256,9 @@ def findMonthlySummaryByAppAndMonth(appname, date, orderStr):
     return records
 
 def findTimeBucketDateForMethod(appname, methodname):
-    ## TODO add date range to method args and query
-
-    sql = "select count(*) from rawlog where app = :appname and method = :methodname and duration >= :durmin and duration <=:durmax"
   
-    #0-9
-    #10-29
-    #30-49
-    #50-99
-    #100-199
-    #200-299
-    #300-499
-    #500-699
-    #700-999
-    #1000-1999
-    #2000+
-    
+    sql = "select count(*) from rawlog where app = :appname and method = :methodname and duration >= :durmin and duration <=:durmax and created > DATE_SUB(CURDATE(),INTERVAL 30 DAY)"
+   
     buckets = [
         {"min":0,"max":9},
         {"min":10,"max":29},
@@ -286,14 +276,12 @@ def findTimeBucketDateForMethod(appname, methodname):
     for bucket in buckets:        
         result = db.session.execute(sql, {'appname':appname, 'methodname':methodname, 'durmin':bucket["min"], 'durmax':bucket["max"]})         
         bucket["cnt"] = int(result.fetchone()[0])
-        
-    
-    app.logger.info(buckets)
-    
+         
     return buckets
     
+def findDailySummaryForMethod(appname, methodname):
+    ## this gets the trailing 30 days  
+    trailingThirty = datetime.now() - timedelta(days=30)       
+    records = DailySummary.query.filter_by(app=appname,method=methodname).filter(DailySummary.formattedcreated >= trailingThirty).order_by('formattedcreated').all()
+    return records
     
-#def findDailySummaryByAppAndDay(appname, day):        
-#    records = DailySummary.query.filter_by(app=appname).all()
-#    return records
-

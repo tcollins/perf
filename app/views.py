@@ -11,8 +11,7 @@ from app import app, models
 # Front page
 @app.route('/')
 def index():  
-    apps = models.findAllAppNames()        
-    app.logger.info('t i m')    
+    apps = models.findAllAppNames()            
     return render_template("index.html", title="PERF", apps=apps)
 
 
@@ -48,8 +47,15 @@ def method(appname, methodname):
     title="PERF - " + appname + " - " + formattedMethod        
     
     timeBucketData = models.findTimeBucketDateForMethod(appname, methodname)
-    
-    return render_template("method.html", title=title, appname=appname, methodname=methodname, formattedMethod=formattedMethod, timeBucketData=timeBucketData)
+    dailySummaryData = models.findDailySummaryForMethod(appname, methodname)
+        
+    return render_template("method.html",
+                           title=title,
+                           appname=appname,
+                           methodname=methodname,
+                           formattedMethod=formattedMethod,
+                           timeBucketData=timeBucketData,
+                           dailySummaryData=dailySummaryData)
 
 @app.errorhandler(404)
 def page_not_found(error):

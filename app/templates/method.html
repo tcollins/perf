@@ -3,15 +3,54 @@
 
 {% block head %}
     <link href="{{url_for('static', filename='morris/morris.css')}}" rel="stylesheet">
+
+    <style>
+        .chart      {border: 1px solid #1ce2b5; background: #fff; border-radius:4px; margin: 30px 0px 0px;}    
+        .chart h4   {text-align: center;}    
+    </style>
 {% endblock %}
 
 {% block content %}
             
-    <h4 style="text-align:center;">{{ appname }}</h4>
+    <h4 style="text-align:center;"><a href="/dashboard/{{ appname }}">{{ appname }}</a></h4>
     <h3 style="text-align:center;" title="{{ methodname }}">{{ formattedMethod }}</h3>
     
-    <br>
-    <div id="time-bucket-chart"></div>
+    
+    <div class="chart">
+        <h4 class="text-muted">Number of Calls per Time Bucket <small>(last 30 days)</small></h4>
+        <div id="time-bucket-chart"></div>
+    </div>
+
+    <div class="row">    
+        <div class="col-md-6">        
+            <div class="chart">
+                <h4 class="text-muted">Average/Min Duration <small>(last 30 days)</small></h4>
+                <div id="avgduration-chart"></div>
+            </div>
+        </div> 
+        <div class="col-md-6">        
+            <div class="chart">
+                <h4 class="text-muted">Number of Calls <small>(last 30 days)</small></h4>
+                <div id="callcount-chart"></div>
+            </div>
+        </div>
+    </div>    
+
+    <div class="row">    
+        <div class="col-md-6">        
+            <div class="chart">
+                <h4 class="text-muted">Total Duration <small>(last 30 days)</small></h4>
+                <div id="totduration-chart"></div>
+            </div>
+        </div> 
+        <div class="col-md-6">        
+            <div class="chart">
+                <h4 class="text-muted">Max Duration <small>(last 30 days)</small></h4>
+                <div id="maxduration-chart"></div>
+            </div>
+        </div>
+    </div>    
+
 
 {% endblock %}  
 
@@ -22,16 +61,76 @@
 
     <script>       
         var tbData = [];    
-        {% for t in timeBucketData %}tbData.push({l: '{{ t.min }} - {{ t.max }}', v:{{ t.cnt }}});
+        {% for t in timeBucketData %}
+            {% if t.max > 3000 %}
+                tbData.push({l: '{{ t.min }} +', v:{{ t.cnt }}});
+            {% else %}
+                tbData.push({l: '{{ t.min }} - {{ t.max }}', v:{{ t.cnt }}});
+            {% endif %}        
         {% endfor %}        
+        
+         var dsData = []; 
+        {% for d in dailySummaryData %}          
+            dsData.push({l: '{{ d.formattedDay() }}', avg:{{ d.avgduration }}, calls:{{ d.callcount }}, min:{{ d.minduration }}, max:{{ d.maxduration }}, tot:{{ d.totalduration }} });
+        {% endfor %}
         
         Morris.Bar({
           element: 'time-bucket-chart',
           data: tbData,              
           xkey: 'l',
           ykeys: ['v'],
-          labels: ['Calls']
+          labels: ['Calls'],
+          xLabelAngle: 35,        
+          barColors: ['#15a685']    
         });   
+         
+         
+         Morris.Line({
+          element: 'avgduration-chart',
+          data: dsData,
+          xLabels: 'day',
+          xLabelAngle: 35,
+          xkey: 'l',
+          ykeys: ['avg', 'min'],
+          labels: ['Average Duration', 'Min Duration'],
+          lineColors: ['#15a685','#1bd3a9']
+        });
+         
+         Morris.Line({
+          element: 'callcount-chart',
+          data: dsData,
+          xLabels: 'day',
+          xLabelAngle: 35,     
+          xkey: 'l',
+          ykeys: ['calls'],
+          labels: ['Calls'],
+          lineColors: ['#15a685']
+        });
+         
+         Morris.Line({
+          element: 'totduration-chart',
+          data: dsData,
+          xLabels: 'day',
+          xLabelAngle: 35,     
+          xkey: 'l',
+          ykeys: ['tot'],
+          labels: ['Total Duration'],
+          lineColors: ['#15a685']
+        });
+         
+        Morris.Line({
+          element: 'maxduration-chart',
+          data: dsData,
+          xLabels: 'day',
+          xLabelAngle: 35,     
+          xkey: 'l',
+          ykeys: ['max'],
+          labels: ['Max Duration'],
+          lineColors: ['#15a685']
+        });
+         
+         
     </script>
 
 {% endblock %} 
+
