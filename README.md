@@ -34,7 +34,7 @@ git python2.7 mysql-server mysql-client libmysqlclient-dev python-mysqldb python
 ```
 
 
-### create "perf" mysql database and run the create schema script ### 
+### create "perf" mysql database and run the create schema script  
 ```sh
 <working dir>$ mysql -u root -p perf < perf-schema.sql
 ```
