@@ -1,8 +1,8 @@
-**Perf**
+Perf  
 =========
-## Performance Log Aggregator and Reporting Dashboard for performance logs. ##
+>  A Flask/Python app 
 
-> ### A Flask/Python app ###
+**Performance Log Aggregator and Reporting Dashboard for performance logs.**
 
 
 ----------
